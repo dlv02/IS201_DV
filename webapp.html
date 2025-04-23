@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 2.5em;
+      text-align: center;
+      line-height: 100px;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .cell:hover {
+      background-color: #e0e0e0;
+    }
+
+    .cell.disabled {
+      pointer-events: none;
+      background-color: #ccc;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+
+    #reset {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    #reset:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <div id="message"></div>
+  <button id="reset">Restart Game</button>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const messageElement = document.getElementById('message');
+    const resetButton = document.getElementById('reset');
+
+    let board = Array(9).fill(null);
+    let playerMoves = [];
+    let computerMoves = [];
+    let gameOver = false;
+
+    function renderBoard() {
+      boardElement.innerHTML = '';
+      board.forEach((value, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell' + (value ? ' disabled' : '');
+        cell.textContent = value || '';
+        cell.addEventListener('click', () => playerMove(index));
+        boardElement.appendChild(cell);
+      });
+    }
+
+    function playerMove(index) {
+      if (gameOver || board[index]) return;
+
+      board[index] = 'X';
+      playerMoves.push(index);
+      renderBoard();
+      checkWinner();
+
+      if (!gameOver) {
+        setTimeout(computerMove, 300);
+      }
+    }
+
+    function computerMove() {
+      const emptyIndices = board
+        .map((val, idx) => val === null ? idx : null)
+        .filter(idx => idx !== null);
+
+      if (emptyIndices.length === 0) return;
+
+      const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      board[randomIndex] = 'O';
+      computerMoves.push(randomIndex);
+      renderBoard();
+      checkWinner();
+    }
+
+    function checkWinner() {
+      const winningCombos = [
+        [0,1,2], [3,4,5], [6,7,8], // rows
+        [0,3,6], [1,4,7], [2,5,8], // cols
+        [0,4,8], [2,4,6]           // diagonals
+      ];
+
+      for (const combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          gameOver = true;
+          const winner = board[a] === 'X' ? 'You' : 'Computer';
+          messageElement.textContent = `${winner} won!`;
+          return;
+        }
+      }
+
+      if (board.every(cell => cell)) {
+        gameOver = true;
+        messageElement.textContent = "It's a tie!";
+      }
+    }
+
+    resetButton.addEventListener('click', () => {
+      board = Array(9).fill(null);
+      playerMoves = [];
+      computerMoves = [];
+      gameOver = false;
+      messageElement.textContent = '';
+      renderBoard();
+    });
+
+    renderBoard();
+  </script>
+  <br>
+  <br>
+  <a href =index.html>Resume page</a>
+  <a href =scratch.html>Scratch page</a>
+</body>
+</html>
